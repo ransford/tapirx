@@ -11,6 +11,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Here we create the package scoped variables mux, server and client so that
@@ -70,17 +72,11 @@ func TestAPISimple(t *testing.T) {
 		time.Time{},
 		"ID0",
 	})
+	assert.NoError(t, err)
 
-	// Check output and errors
-	if err != nil {
-		panic(err)
-	}
-	if message, ok := result["message"]; !ok {
-		t.Errorf("'message' key not in JSON response")
-	} else if message != "Dummy message." {
-		t.Errorf("'message' value in JSON response is not expected value.")
-	}
-
+	message, ok := result["message"]
+	assert.True(t, ok)
+	assert.Equal(t, message, "Dummy message")
 }
 
 func TestAPIThrottling(t *testing.T) {
@@ -117,7 +113,5 @@ func TestAPIThrottling(t *testing.T) {
 	}
 
 	// Expect all uploads to fail except one
-	if throttlingFailures != cap(errors)-1 {
-		t.Errorf("Expected exactly 1 throttling failure")
-	}
+	assert.Equal(t, throttlingFailures, cap(errors)-1)
 }

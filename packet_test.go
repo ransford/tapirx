@@ -6,6 +6,7 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+	"github.com/stretchr/testify/assert"
 
 	// import layers to run its init function
 	_ "github.com/google/gopacket/layers"
@@ -35,15 +36,11 @@ func TestPacketParseSimple(t *testing.T) {
 	stats = *NewStats()
 	apiClient := NewAPIClient("", "", "", 1, false)
 	assetCSVWriter, err := NewAssetCSVWriter("")
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	// Read a pcap file
 	handle, err := pcap.OpenOffline("testdata/HL7-ADT-UDI-PRT.pcap")
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
 	// Handle each packet from the pcap file
@@ -54,13 +51,9 @@ func TestPacketParseSimple(t *testing.T) {
 	}
 
 	// Check stats
-	if nPrt16 := stats.Provenances["HL7 PRT-16"]; nPrt16 != 1 {
-		t.Errorf("Not enough HL7 packets: %d (wanted %d)", nPrt16, 1)
-	}
-	if nPkts := stats.TotalPacketCount; nPkts != numPackets {
-		t.Errorf("Wrong total packet count: %d (wanted %d)", nPkts, numPackets)
-	}
-
+	nPrt16 := stats.Provenances["HL7 PRT-16"]
+	assert.Equal(t, nPrt16, 1)
+	assert.Equal(t, stats.TotalPacketCount, numPackets)
 }
 
 // Create an empty Packet and ignore it
@@ -70,13 +63,8 @@ func TestSkipEmptyPacket(t *testing.T) {
 	stats = *NewStats()
 	handlePacket(pkt, testDecoders, nil, nil, nil)
 
-	if stats.TotalPacketCount != 1 {
-		t.Errorf("Wrong number of packets")
-	}
-
-	if len(stats.Identifiers) != 0 {
-		t.Errorf("Expected to find no identifiers; found %d", len(stats.Identifiers))
-	}
+	assert.Equal(t, stats.TotalPacketCount, 1)
+	assert.Equal(t, len(stats.Identifiers), 0)
 }
 
 // Create an empty Packet to measure the overhead of ignoring it
