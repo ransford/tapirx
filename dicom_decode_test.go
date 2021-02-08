@@ -13,37 +13,30 @@ import (
 
 	// import layers to run its init function
 	_ "github.com/google/gopacket/layers"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var dicomDecoder DicomDecoder
 
 func init() {
-	if err := dicomDecoder.Initialize(); err != nil {
-		panic("Failed to initialize DICOM decoder")
-	}
+	dicomDecoder.Initialize()
 }
 
 func TestDicomFile(t *testing.T) {
 	testfiles, err := filepath.Glob("testdata/dicom*.pcap")
-	if err != nil {
-		panic(err)
-	}
-	if len(testfiles) == 0 {
-		panic("Couldn't find DICOM test files")
-	}
+	require.NoError(t, err)
+	require.NotEqual(t, len(testfiles), 0)
 
 	for _, testfile := range testfiles {
-		if findDicomIdentifierInPcap(testfile) == "" {
-			t.Errorf("Failed to find identifier in DICOM file %s", testfile)
-		}
+		assert.NotEqual(t, findDicomIdentifierInPcap(t, testfile), "")
 	}
 }
 
-func findDicomIdentifierInPcap(testfile string) string {
+func findDicomIdentifierInPcap(t *testing.T, testfile string) string {
 	handle, err := pcap.OpenOffline(testfile)
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	var identifier string
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -83,13 +76,7 @@ func TestDicomAppLayerGood(t *testing.T) {
 	appLayer := gopacket.ApplicationLayer(gopacket.Payload(appBytes))
 	identifier, _, _ := dicomDecoder.DecodePayload(&appLayer)
 
-	if identifier == "" {
-		t.Errorf("Failed to find identifier in payload %s", appBytes)
-	}
-	expectedID := "bogus sender foo"
-	if identifier != expectedID {
-		t.Errorf("Bad identifier: expected '%s', got '%s'", expectedID, identifier)
-	}
+	assert.Equal(t, identifier, "bogus sender foo")
 }
 
 func BenchmarkDicomDecode(b *testing.B) {
@@ -130,9 +117,7 @@ func TestAETitleWhitespace(t *testing.T) {
 
 		appLayer := gopacket.ApplicationLayer(gopacket.Payload(appBytes))
 		identifier, _, _ := dicomDecoder.DecodePayload(&appLayer)
-		if identifier != tt.expectedID {
-			t.Errorf("Bad identifier: expected '%s', got '%s'", tt.expectedID, identifier)
-		}
+		assert.Equal(t, identifier, tt.expectedID)
 	}
 }
 
@@ -164,8 +149,6 @@ func TestAEBadBytes(t *testing.T) {
 
 		appLayer := gopacket.ApplicationLayer(gopacket.Payload(appBytes))
 		identifier, _, _ := dicomDecoder.DecodePayload(&appLayer)
-		if identifier != "" {
-			t.Errorf("Bad byte '%x' in offset '%d' should have caused decoding to fail", tt.badByte, tt.offset)
-		}
+		assert.Equal(t, identifier, "")
 	}
 }

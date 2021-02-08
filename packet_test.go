@@ -6,10 +6,11 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	"github.com/stretchr/testify/assert"
 
 	// import layers to run its init function
 	_ "github.com/google/gopacket/layers"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var testDecoders []PayloadDecoder
@@ -20,8 +21,9 @@ func init() {
 		&DicomDecoder{},
 	}
 	for _, decoder := range testDecoders {
-		if err := decoder.Initialize(); err != nil {
-			panic("Failed to initialize decoders")
+		err := decoder.Initialize()
+		if err != nil {
+			panic(err)
 		}
 	}
 }

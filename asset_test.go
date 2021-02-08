@@ -8,6 +8,9 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Write a file and read it.
@@ -30,23 +33,17 @@ func TestAssetCSV(t *testing.T) {
 	// Write file
 	w, err := NewAssetCSVWriter("out.csv")
 	defer os.Remove("out.csv")
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 	w.Append(asset)
 	w.Append(asset)
 	w.Close()
 
 	// Read file
 	actual, err := ioutil.ReadFile("out.csv")
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 	expected := `ipv4_address,ipv6_address,open_port_tcp,connect_port_tcp,mac_address,identifier,provenance,last_seen,client_id
 10.0.0.1,0000:0000:0000:0000:0000:FFFF:0A00:0001,2575,11:22:33:44:55:66,Hospira Plum A+,HL7,0001-01-01 00:00:00 +0000 UTC,ID0
 10.0.0.1,0000:0000:0000:0000:0000:FFFF:0A00:0001,2575,11:22:33:44:55:66,Hospira Plum A+,HL7,0001-01-01 00:00:00 +0000 UTC,ID0
 `
-	if string(actual) != expected {
-		t.Errorf("CSV file actual %s does not match expected: %s\n", actual, expected)
-	}
+	assert.Equal(t, string(actual), expected)
 }
