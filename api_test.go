@@ -76,7 +76,7 @@ func TestAPISimple(t *testing.T) {
 
 	message, ok := result["message"]
 	assert.True(t, ok)
-	assert.Equal(t, message, "Dummy message")
+	assert.Equal(t, message, "Dummy message.")
 }
 
 func TestAPIThrottling(t *testing.T) {

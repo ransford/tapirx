@@ -41,11 +41,11 @@ func TestStatsString(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, resultStats.TotalPacketCount, stats.TotalPacketCount)
 	assert.Equal(t, len(resultStats.IPv4Addresses), 1)
-	assert.Equal(t, resultStats.IPv4Addresses[testIP], 1)
+	assert.Equal(t, resultStats.IPv4Addresses[testIP], uint64(1))
 	assert.Equal(t, len(resultStats.IPv6Addresses), 1)
 	assert.Equal(t, len(resultStats.Ports), 2)
 	assert.Equal(t, len(resultStats.MACs), 1)
-	assert.Equal(t, resultStats.MACs[testMAC], 1)
+	assert.Equal(t, resultStats.MACs[testMAC], uint64(1))
 	assert.Equal(t, len(resultStats.Identifiers), 1)
 	assert.Equal(t, len(resultStats.Provenances), 1)
 	assert.Equal(t, len(resultStats.UploadResults), 2)
@@ -80,8 +80,8 @@ func TestStatsSameID(t *testing.T) {
 		"ID0",
 	})
 
-	assert.Equal(t, stats.TotalPacketCount, 2)
-	assert.Equal(t, stats.Provenances["HL7"], 2)
+	assert.Equal(t, stats.TotalPacketCount, uint64(2))
+	assert.Equal(t, stats.Provenances["HL7"], uint64(2))
 	assert.Equal(t, len(stats.MACs), 2)
 	assert.Equal(t, len(stats.IPv4Addresses), 2)
 	assert.Equal(t, len(stats.IPv6Addresses), 2)
@@ -117,8 +117,8 @@ func TestStatsDifferentID(t *testing.T) {
 		"ID0",
 	})
 
-	assert.Equal(t, stats.TotalPacketCount, 2)
-	assert.Equal(t, stats.Provenances["HL7"], 2)
+	assert.Equal(t, stats.TotalPacketCount, uint64(2))
+	assert.Equal(t, stats.Provenances["HL7"], uint64(2))
 	assert.Equal(t, len(stats.MACs), 2)
 	assert.Equal(t, len(stats.IPv4Addresses), 2)
 	assert.Equal(t, len(stats.IPv6Addresses), 2)
@@ -154,8 +154,8 @@ func TestStatsSameEverything(t *testing.T) {
 		"ID0",
 	})
 
-	assert.Equal(t, stats.TotalPacketCount, 2)
-	assert.Equal(t, stats.Provenances["HL7"], 2)
+	assert.Equal(t, stats.TotalPacketCount, uint64(2))
+	assert.Equal(t, stats.Provenances["HL7"], uint64(2))
 	assert.Equal(t, len(stats.MACs), 1)
 	assert.Equal(t, len(stats.IPv4Addresses), 1)
 	assert.Equal(t, len(stats.IPv6Addresses), 1)

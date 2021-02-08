@@ -54,7 +54,7 @@ func TestPacketParseSimple(t *testing.T) {
 
 	// Check stats
 	nPrt16 := stats.Provenances["HL7 PRT-16"]
-	assert.Equal(t, nPrt16, 1)
+	assert.Equal(t, nPrt16, uint64(1))
 	assert.Equal(t, stats.TotalPacketCount, numPackets)
 }
 
@@ -65,7 +65,7 @@ func TestSkipEmptyPacket(t *testing.T) {
 	stats = *NewStats()
 	handlePacket(pkt, testDecoders, nil, nil, nil)
 
-	assert.Equal(t, stats.TotalPacketCount, 1)
+	assert.Equal(t, stats.TotalPacketCount, uint64(1))
 	assert.Equal(t, len(stats.Identifiers), 0)
 }
 
